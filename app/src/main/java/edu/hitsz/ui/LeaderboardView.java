@@ -21,8 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 排行榜页，对应桌面版 {@code LeaderboardPanel}：录入本局成绩、按难度展示榜单、
- * 支持删除选中记录与返回菜单。
+ * 排行榜页：录入本局成绩、按难度展示榜单、删除选中记录、返回菜单。
  */
 public class LeaderboardView extends LinearLayout {
 

@@ -25,17 +25,16 @@ import java.util.Objects;
 /**
  * 游戏主循环与规则引擎。
  * <p>
- * 与桌面版的区别：不再是 {@code JPanel}，也不再自己持有 {@code java.util.Timer}
- * 和鼠标监听。一次 {@link #tick()} 推进一帧，调用方（Android 侧的主线程
- * {@code Handler}，或单元测试）决定节奏；渲染与输入由 {@code GameView} 负责。
- * 这样 <b>所有</b> 游戏状态只在单一线程内变更，消灭了原实现里
- * "定时器线程改集合、EDT 读集合" 的数据竞争。
+ * 本类<b>不依赖任何 Android 或 UI 类型</b>，因此能在 JVM 单测里直接跑。
+ * 一次 {@link #tick()} 推进一帧，节奏由调用方决定（{@code ui.BaseGame} 的绘制线程，
+ * 或测试代码）；渲染与输入都在外部。
+ * 这样<b>所有</b>游戏状态只在单一线程内变更，不存在并发读写集合的问题。
  *
  * @author hitsz
  */
 public abstract class Game {
 
-    /** 游戏结束回调，替代桌面版直接调用外层应用的页面切换。 */
+    /** 游戏结束回调。由引擎触发一次，界面层负责切到结算页。 */
     public interface GameOverListener {
         void onGameOver(String difficulty, int score, String achievementSummary);
     }
@@ -57,7 +56,7 @@ public abstract class Game {
     private static final int BOSS_SCORE_THRESHOLD = 300;
     private static final int BOSS_SUPPLY_DROP_COUNT = 3;
 
-    /** 一帧的固定时间步长（毫秒），与桌面版 {@code Timer} 周期一致。 */
+    /** 一帧的固定时间步长（毫秒）。界面层的绘制线程按此间隔调用 {@link #tick()}。 */
     public static final int FRAME_INTERVAL_MILLIS = 40;
 
     private final Sprite backgroundImage;

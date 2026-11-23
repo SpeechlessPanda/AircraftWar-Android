@@ -1,7 +1,7 @@
 package edu.hitsz.application;
 
 /**
- * 按难度创建对应 {@link Game} 子类，保持桌面版的工厂入口签名。
+ * 按难度创建对应的 {@link Game} 子类。难度字符串不区分大小写，未知值回落到 normal。
  */
 public final class GameFactory {
 

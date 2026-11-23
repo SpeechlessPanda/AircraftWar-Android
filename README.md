@@ -1,92 +1,114 @@
 # AircraftWar2026
 
-Windows 版 Java Swing 飞机大战（`https://github.com/…/AircraftWar`）迁移到 Android 的工程。语言保持 Java，包名沿用 `edu.hitsz`，游戏规则与数值平衡不变。
+一款用 Java 和 Android Framework 原生 API 实现的竖屏飞机大战。
 
-## 环境
+玩家拖动屏幕底部控制英雄机，自动射击；击毁敌机得分，拾取补给强化火力或回血，撞机即死。三档难度各自独立的敌机强度、成长曲线与补给掉落率，成绩按难度分别记录到排行榜。
 
-| 项 | 值 |
+## 环境要求
+
+| 项 | 要求 |
 |---|---|
-| Gradle | 8.11.1（wrapper，发行包走腾讯镜像） |
-| Android Gradle Plugin | 8.10.1 |
-| JDK | 21（`gradle.properties` 用 `org.gradle.java.home` 固定） |
-| compileSdk / targetSdk | 35 |
-| minSdk | 30（课程要求） |
-| 语言 | Java 17 源级 |
+| JDK | **21**（Gradle 8.11.1 只支持在 JDK 17–23 上运行） |
+| Android Studio | 支持 AGP 8.10.1 的版本（Ladybug 及以上） |
+| Android SDK | compileSdk 35，需安装 Android 15（API 35）平台 |
+| 运行设备 | Android 11（API 30）及以上的真机或模拟器 |
 
-`gradle.properties` 里的 JDK 路径是本机绝对路径。换机器时改成该机的 JDK 21，或在 Android Studio 的 *Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK* 里覆盖。
+本工程**不含**任何本机路径配置。JDK 由你的 IDE 或环境变量提供：
 
-## 构建与运行
+- Android Studio：`Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK` 选 21
+- 命令行：`export JAVA_HOME=...`（Windows：`set JAVA_HOME=...`）
 
-```bash
-./gradlew assembleDebug          # 产物 app/build/outputs/apk/debug/app-debug.apk
-./gradlew testDebugUnitTest      # 单元测试（58 个用例）
-```
+`local.properties`（指向本机 SDK 路径）由 Android Studio 首次打开时自动生成，已在 `.gitignore` 中，**不要提交**。
 
-安装到已连接的设备/模拟器：
+## 开始
 
 ```bash
+# 克隆后直接构建
+./gradlew assembleDebug          # 产物：app/build/outputs/apk/debug/app-debug.apk
+./gradlew testDebugUnitTest      # 单元测试
+
+# 装到设备 / 模拟器
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n edu.hitsz.aircraftwar/edu.hitsz.MainActivity
 ```
 
-或用 Android Studio 直接打开本目录（Gradle 工程），Run `app`。
+Windows 上如果 `./gradlew` 报权限问题，用 `gradlew.bat`；Linux / macOS 上首次可能需要 `chmod +x gradlew`。
 
-## 结构
+用 Android Studio 直接 `Open` 本目录即可，Gradle 会自动同步。
+
+### 修改 Gradle / AGP 版本时注意
+
+`gradle/wrapper/gradle-wrapper.properties` 里的发行包地址指向腾讯云镜像，因为国内直连 `services.gradle.org` 经常超时。如果你在能直连的环境，可以改回官方地址；`distributionSha256Sum` 与版本号必须匹配，否则 wrapper 会拒绝启动。
+
+## 代码结构
 
 ```
 app/src/main/java/edu/hitsz/
-├── MainActivity.java          # 唯一 Activity：难度页 / 游戏页 / 排行榜页切换
-├── aircraft/                  # 英雄机、普通敌机、精英敌机、王牌、Boss
-├── application/               # 纯逻辑引擎 Game、难度子类、成就、音频门面
-├── basic/                     # 飞行对象基类、逻辑世界尺寸 World
-├── bullet/                    # 英雄子弹、敌机子弹
-├── dao/                       # 排行榜记录与文本持久化
-├── factory/                   # 敌机与道具工厂
-├── platform/                  # Android 实现：drawable 解码、SoundPool/MediaPlayer
-├── prop/                      # 补给道具、炸弹/冻结观察者
-├── render/                    # Sprite / SpriteLoader 接缝
-├── strategy/                  # 直射、扇射、环射、不射击
-└── ui/                        # BaseGame（SurfaceView）、难度页、排行榜页
+├── MainActivity.java          唯一 Activity：难度页 / 游戏页 / 排行榜页之间切换
+├── aircraft/                  英雄机、普通敌机、三类精英敌机、Boss
+├── application/               游戏引擎与规则
+│   ├── Game.java              纯逻辑引擎：tick() 推进一帧，不含任何 Android/UI 代码
+│   ├── EasyGame / NormalGame / HardGame   三档难度（模板方法）
+│   ├── GameFactory.java       按难度创建（工厂方法）
+│   ├── Achievement*.java      成就定义与解锁记录
+│   ├── AudioManager.java      音频门面
+│   └── SoundPlayer.java       音频接缝（接口）
+├── basic/                     飞行对象基类、逻辑世界尺寸 World
+├── bullet/                    英雄子弹、敌机子弹
+├── dao/                       排行榜记录与文本持久化
+├── factory/                   敌机与道具工厂
+├── platform/                  Android 实现：图片解码、音频播放
+├── prop/                      补给道具、炸弹/冻结的观察者
+├── render/                    Sprite / SpriteLoader 接缝
+├── strategy/                  直射、扇射、环射、不射击（策略模式）
+└── ui/                        BaseGame（SurfaceView）、难度页、排行榜页
 app/src/main/res/
-├── drawable-nodpi/            # 16 张游戏图（必须 nodpi，见下）
-├── raw/                       # 6 个音频
-├── layout/                    # activity_main.xml
-└── values/                    # strings.xml
+├── drawable-nodpi/            16 张游戏图
+├── raw/                       6 个音频
+├── layout/                    activity_main.xml
+└── values/                    strings.xml
 ```
 
-## 三个必须知道的实现约束
+## 改代码前必须知道的四件事
 
-1. **图片必须放 `res/drawable-nodpi` 且解码时 `inScaled=false`。**
-   素材按 512×768 逻辑世界设计。放进 density 目录会被按屏幕密度放大（实测 hero 100×83 → 263×218），逻辑坐标写死的碰撞与摆位会整体错位。`WorldTest.backgroundImageIsExactlyOneWorldTall` 会守住这条。
+**1. 游戏逻辑必须留在 `application/Game.java` 里，不要下沉到 UI。**
 
-2. **游戏逻辑跑在绘制线程里，主线程只碰 View。**
-   `ui.BaseGame` 是 `SurfaceView`，`run()` 里每帧「先 `Game.tick()` 再 `lockCanvas` 绘制」。游戏结束回调来自该线程，`MainActivity` 必须 `mainHandler.post(...)` 回主线程再切页。`surfaceDestroyed` 会 `join` 等待线程真正退出。
+`Game` 不依赖任何 Android 类，因此可以在 JVM 里直接跑单元测试（`app/src/test` 里有 58 个用例覆盖它）。渲染与触摸在 `ui/BaseGame`，页面切换在 `MainActivity`。新增玩法逻辑放 `Game`，新增视觉效果放 `BaseGame`。
 
-3. **排行榜写到应用私有目录。**
-   桌面版写工作目录下的 `scores/`；Android 用 `ScoreStorage.setBaseDir(getFilesDir()/scores)`，文件格式仍是 `玩家名,分数,yyyy-MM-dd HH:mm:ss`。
+**2. 逻辑坐标固定 512×768，不要写死屏幕像素。**
+
+`basic/World` 定义逻辑世界尺寸。`ui/BaseGame` 在 `surfaceChanged` 里算等比缩放与 letterbox 偏移，绘制时套变换，触摸时反向解算。任何位置、速度、碰撞尺寸都用逻辑坐标，换设备才不会跑偏。
+
+**3. 图片必须放 `res/drawable-nodpi`，且解码时 `inScaled=false`。**
+
+这些素材是按 512×768 逻辑世界设计的像素图。放进 `drawable` / `drawable-hdpi` 等带密度的目录会被系统按屏幕密度放大（实测 hero 100×83 会变成 263×218），逻辑坐标写死的碰撞盒会整体错位。`WorldTest` 会守住这条，别为了让测试变绿而改断言。
+
+**4. 游戏逻辑跑在绘制线程里，主线程只碰 View。**
+
+`ui/BaseGame` 是 `SurfaceView`，`run()` 里每帧「先 `Game.tick()` 再 `lockCanvas` 绘制」。因此游戏结束回调来自绘制线程，`MainActivity.onGameOver` 必须 `mainHandler.post(...)` 回主线程后再切页。`surfaceDestroyed` 会 `join` 等待线程真正退出——只置标志位不等，退出后仍有线程持有 Surface，再进入会黑屏或闪退。
 
 ## 测试
 
-58 个 JUnit 5 用例，覆盖飞行器、策略、工厂、道具观察者、DAO、难度模板、难度成长、计分成就、排行榜行映射，以及迁移新增的帧契约（`GameTickTest`）与逻辑世界契约（`WorldTest`）。
+```bash
+./gradlew testDebugUnitTest
+```
 
-Android 单测的编译期 bootclasspath 是 `android.jar`，**没有 `java.awt` / `javax.imageio`**。测试加载图片走 `support/TestAssets`，直接解析 PNG IHDR 与 JPEG SOFn 段取宽高；`TestAssetsExtension` 通过 JUnit 5 自动扩展在所有测试前初始化图片表。
+58 个 JUnit 5 用例，覆盖飞行器、射击策略、敌机与道具工厂、观察者效果、DAO、难度模板、难度成长、计分与成就、排行榜行映射，以及引擎的帧契约（`GameTickTest`）与逻辑世界契约（`WorldTest`）。
 
-## 文档
+**写新测试注意**：Android 单元测试的编译期 bootclasspath 是 `android.jar`，里面**没有** `java.awt` 和 `javax.imageio`。需要读图片尺寸时用 `support/TestAssets`（直接解析 PNG / JPEG 文件结构），不要 `import javax.imageio`，否则编译直接失败。图片表的初始化由 `TestAssetsExtension` 通过 JUnit 5 自动扩展完成，新测试类不必自己调 `ImageManager.init`。
 
-- `docs/specs/2026-11-23-aircraftwar-android-design.md`：设计（方案对比、接缝、UI、存储、资源）
-- `docs/plans/2026-11-23-aircraftwar-android.md`：四步迁移路线的实施与验证记录
-- `docs/migration-reuse.md`：原文件 → 新位置逐文件复用清单、不迁移原因、行为等价性
-- `docs/ai-usage-log.md`：AI 使用日志
-- `evidence/`：模拟器截图与 logcat
+游戏引擎的测试钩子是包内可见的（如 `enemyAircraftsForTest()`），只在 `edu.hitsz.application` 包里的测试能用，不要在业务代码里调用。
 
-## 与桌面版的已知差异
+## 音频说明
 
-| 项 | 桌面版 | 本工程 |
-|---|---|---|
-| 输入 | 鼠标拖拽 | 触屏拖动（抬手后停在最后位置） |
-| 音频 | `javax.sound.sampled.Clip` | `SoundPool`（音效）+ `MediaPlayer`（BGM），失败只记日志 |
-| 线程 | Timer 线程改集合、EDT 读集合 | 逻辑与绘制同线程，无并发读写 |
-| 后台 | 无概念 | `onPause` 停绘制线程，`onResume` 由 `surfaceCreated` 重启 |
-| 难度页/排行榜 | Swing 组件 | `LinearLayout` + `ListView` + `AlertDialog` |
+音效走 `SoundPool`，背景音乐走 `MediaPlayer`。任何一次加载或播放失败只写日志、不抛异常——音频不可用不应让游戏崩溃。模拟器以 `-no-audio` 启动或系统静音时听不到声音，属正常现象，不影响游戏逻辑。
 
-音频在模拟器上可能因系统静音或无音频设备而听不到，不影响游戏逻辑。
+## 排行榜存储
+
+成绩写到应用私有目录 `files/scores/records-{easy,normal,hard}.txt`，每行格式：
+
+```
+玩家名,分数,yyyy-MM-dd HH:mm:ss
+```
+
+三档难度各一个文件，互不影响。卸载应用会一并清除。

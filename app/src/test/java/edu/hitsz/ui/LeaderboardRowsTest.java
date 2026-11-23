@@ -13,9 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * 排行榜行映射与成就文案。
  * <p>
- * 这个类与桌面版 {@code LeaderboardTableModel} 承担同样的职责：名次从 1 开始、
- * 顺序沿用 DAO 的排序结果、时间用固定格式。它是纯数据映射，不碰 Android，
- * 所以能直接在 JVM 单测里跑。
+ * 名次从 1 开始、顺序沿用 DAO 的排序结果、时间用固定格式。
+ * 纯数据映射，不碰 Android，可直接在 JVM 单测里跑。
  */
 class LeaderboardRowsTest {
 

@@ -16,7 +16,7 @@ class BossSupplyDropTest {
 
     @Test
     void bossSuppliesAreSpreadAroundBossPosition() {
-        // 原测试用反射读 Game.props；迁移后 Game 暴露了包内访问器，测试不再依赖字段名。
+        // 用包内访问器读 props，测试不依赖私有字段名。
         HardGame game = new HardGame(null);
         BossEnemy boss = BossEnemy.createDefault(240, 80);
 

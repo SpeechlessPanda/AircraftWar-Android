@@ -18,8 +18,6 @@ import java.util.Map;
  * Android 音频实现：短音效走 {@link SoundPool}（低延迟、可叠加），
  * 背景音乐走 {@link MediaPlayer}（支持长音频循环）。
  * <p>
- * 对应桌面版的 {@code javax.sound.sampled.Clip}：{@code AudioSystem.getClip()}
- * → {@code SoundPool.load} / {@code MediaPlayer.setDataSource}。
  * <p>
  * 任何单次播放失败都只记日志，不向上抛异常：音频不是可玩性的前置条件，
  * 一处解码失败不应该让整局游戏崩掉。

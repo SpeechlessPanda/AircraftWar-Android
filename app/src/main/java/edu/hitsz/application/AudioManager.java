@@ -3,8 +3,8 @@ package edu.hitsz.application;
 /**
  * 音频门面，集中维护资源路径并把调用转发给当前安装的 {@link SoundPlayer}。
  * <p>
- * 与桌面版相比只换掉了底层播放器，调用点（{@code Game}、{@code BombSupply}）
- * 的 API 完全不变。
+ * 上层（{@code Game}、{@code BombSupply}）只认这里的常量与门面方法，
+ * 不直接接触 {@code SoundPool} / {@code MediaPlayer}，因此单元测试可以替换成静音实现。
  */
 public class AudioManager {
 

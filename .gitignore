@@ -1,24 +1,47 @@
-# Gradle
+# ---- Gradle ----
 .gradle/
 build/
 app/build/
 
-# Android Studio
+# ---- 本机配置（路径、SDK 位置，绝不能进版本库）----
+local.properties
+
+# ---- Android Studio / IntelliJ ----
 .idea/
 *.iml
-local.properties
+*.ipr
+*.iws
 captures/
 .externalNativeBuild/
 .cxx/
+.navigation/
 
-# OS / editor
-.DS_Store
-Thumbs.db
+# ---- 构建产物 ----
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.hprof
+output-metadata.json
+
+# ---- 日志与本地临时文件 ----
 *.log
+*.tmp
+*.bak
+*.orig
+*.rej
 
-# 本地取证产物（截图体积大，按需提交）
-# 取证截图体积较大，按需提交；最终验收截图保留在版本库
-# evidence/*.png
+# ---- 操作系统 ----
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-# 本地工作区笔记
+# ---- 本地工具与个人笔记 ----
 .workbuddy/
+.vscode/
+docs/private/

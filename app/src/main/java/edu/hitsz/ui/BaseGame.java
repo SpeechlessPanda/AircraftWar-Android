@@ -34,7 +34,7 @@ public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private static final String TAG = "AircraftWar";
 
-    /** 一帧的目标间隔，与桌面版 40ms 定时器一致。 */
+    /** 一帧的目标间隔，取自引擎的固定步长。 */
     private static final long FRAME_INTERVAL_MILLIS = Game.FRAME_INTERVAL_MILLIS;
 
     private final SurfaceHolder holder;
@@ -199,7 +199,7 @@ public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Run
         if (bitmap == null) {
             return;
         }
-        // 上下两张拼接实现无缝滚动，与桌面版两次 drawImage 等价。
+        // 上下两张拼接实现无缝滚动：偏移量在 [0, HEIGHT) 内循环。
         int offset = current.getBackgroundOffset();
         drawBackgroundTile(canvas, bitmap, offset - World.HEIGHT);
         drawBackgroundTile(canvas, bitmap, offset);
@@ -244,7 +244,7 @@ public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     // ***********************
-    // 触屏输入：替代桌面版 HeroController 的鼠标拖拽
+    // 触屏输入：拖动即移动英雄机
     // ***********************
 
     @Override
@@ -261,7 +261,7 @@ public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Run
                 return true;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                // 抬手后英雄机停在最后位置，与桌面版拖拽结束行为一致。
+                // 抬手后英雄机停在最后位置，不回到原点。
                 return true;
             default:
                 return super.onTouchEvent(event);

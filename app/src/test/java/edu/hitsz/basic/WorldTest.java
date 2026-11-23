@@ -9,9 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * 逻辑世界尺寸契约。
  * <p>
- * 整个迁移的坐标体系都建立在这两个常量上：碰撞、出界判定、敌机生成位置、
- * 触摸坐标反算、渲染缩放比例。桌面版用的是 {@code Main.WINDOW_WIDTH/HEIGHT}，
- * Android 上与 Swing 入口类解耦后搬到 {@link World}。
+ * 整个坐标体系都建立在这两个常量上：碰撞、出界判定、敌机生成位置、
+ * 触摸坐标反算、渲染缩放比例。改动它们等于改动全部游戏手感。
  */
 class WorldTest {
 

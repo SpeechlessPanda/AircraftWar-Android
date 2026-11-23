@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * 难度选择页，对应桌面版的 {@code DifficultySelectPanel}。
+ * 难度选择页：三个按钮分别以 easy / normal / hard 回调上层。
  */
 public class DifficultyView extends LinearLayout {
 

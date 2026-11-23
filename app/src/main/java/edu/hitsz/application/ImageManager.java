@@ -24,9 +24,9 @@ import java.util.Map;
 /**
  * 综合管理图片的加载与访问。
  * <p>
- * 与桌面版的差别只在"怎么解码"：{@code ImageIO.read(文件)} 换成由调用方注入的
- * {@link SpriteLoader}（Android 侧是 {@code BitmapFactory.decodeResource}）。
- * 注册表、懒加载与按难度取背景的接口全部保留。
+ * 解码方式由调用方注入的 {@link SpriteLoader} 决定（应用里是
+ * {@code platform.DrawableSpriteLoader}，单元测试里是直接读文件头取尺寸的实现），
+ * 因此本类不依赖 {@code android.graphics}，也不参与 JVM 单测的图片解码。
  *
  * @author hitsz
  */

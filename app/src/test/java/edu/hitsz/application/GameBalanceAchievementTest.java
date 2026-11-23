@@ -8,10 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * 三档难度的平衡参数。
  * <p>
- * 注意：原仓库 HEAD 上这个测试是<b>失败</b>的——它断言补给概率
- * {@code easy>0.85 / normal>0.70 / hard>0.55}，而代码常量实际是
- * {@code 0.55 / 0.40 / 0.30}。迁移时不改游戏数值，改断言为"三档单调递减
- * 且彼此不同"，这样它仍能在有人改坏难度区分时失败，而不是把断言放宽成恒真。
+ * 补给掉落率必须三档严格递减且等于既定数值；难度区分若被抹平，这里会失败。
  */
 class GameBalanceAchievementTest {
 

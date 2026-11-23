@@ -16,11 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * 迁移新增的"引擎单帧推进"契约。
+ * 引擎单帧推进的契约。
  * <p>
- * 桌面版一帧由 {@code java.util.Timer} 的 TimerTask 触发；迁移后改由渲染线程
- * 每帧调用 {@link Game#tick()}。这些测试守住三件事：没 start 不能动、start 后
- * 逻辑真的在推进、结束只结算一次。
+ * 界面层的绘制线程每帧调用 {@link Game#tick()}；这些测试守住三件事：
+ * 没 start 不能动、start 后逻辑真的在推进、结束只结算一次。
  */
 class GameTickTest {
 

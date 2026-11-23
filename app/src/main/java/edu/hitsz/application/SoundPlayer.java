@@ -1,9 +1,8 @@
 package edu.hitsz.application;
 
 /**
- * 音频输出接缝。桌面版基于 {@code javax.sound.sampled.Clip}，
- * Android 版基于 {@code SoundPool} + {@code MediaPlayer}，
- * 单元测试用记录型实现。
+ * 音频输出接缝。应用内由 {@code platform.AndroidSoundPlayer}（{@code SoundPool}
+ * 负责音效、{@code MediaPlayer} 负责背景音乐）实现，单元测试可换成记录型实现。
  */
 public interface SoundPlayer {
 

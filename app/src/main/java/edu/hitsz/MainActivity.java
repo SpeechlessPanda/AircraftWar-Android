@@ -20,7 +20,7 @@ import edu.hitsz.ui.DifficultyView;
 import edu.hitsz.ui.LeaderboardView;
 
 /**
- * 应用唯一 Activity，承担桌面版 {@code AircraftWarApp} 的页面切换职责：
+ * 应用唯一 Activity，负责三个页面之间的切换：
  * 难度选择 → 游戏 → 排行榜 → 菜单。
  * <p>
  * 线程边界：游戏逻辑与绘制都在 {@link BaseGame} 的子线程里跑，因此

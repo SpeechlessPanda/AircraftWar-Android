@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * 把 {@link ScoreRecord} 映射成排行榜行数据。
  * <p>
- * 桌面版用 {@code DefaultTableModel} 承载这个映射，Android 上表格换成列表，
- * 但"名次从 1 开始、分数降序、时间用固定格式"的展示契约保持一致。
+ * 名次从 1 开始，顺序沿用 DAO 的排序结果，时间用固定格式。
+ * 本类不依赖 Android，可在 JVM 单测里直接验证。
  */
 public final class LeaderboardRows {
 
@@ -65,7 +65,7 @@ public final class LeaderboardRows {
     }
 
     /**
-     * 回合结算后的成就描述，对应桌面版 {@code LeaderboardPanel.formatAchievementSummaryForDisplay}。
+     * 回合结算后的成就描述：为空时给出可读的兜底文案。
      */
     public static String formatAchievementSummary(String achievementSummary) {
         if (achievementSummary == null || achievementSummary.trim().isEmpty()) {

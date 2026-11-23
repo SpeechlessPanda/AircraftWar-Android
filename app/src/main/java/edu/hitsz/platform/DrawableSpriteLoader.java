@@ -19,10 +19,10 @@ import java.util.Map;
  * <p>
  * 逻辑名到资源 ID 的映射集中在这里，领域层因此不需要 import {@code R}。
  * <p>
- * <b>必须固定在 {@code res/drawable-nodpi}：</b>这些资源和桌面版一样是按
- * 512x768 逻辑世界设计的像素素材，只有在 nodpi 下解码才能得到与原始文件一致的
- * 位图尺寸（hero 100x83）。放在 density 目录里会被按屏幕密度放大到 263x218，
- * 逻辑坐标写死的碰撞与摆位会整体错位。
+ * <b>素材必须固定在 {@code res/drawable-nodpi}，并且这里设 {@code inScaled=false}：</b>
+ * 这些图是按 512x768 逻辑世界设计的像素素材，只有在 nodpi 下解码才能得到与
+ * 原始文件一致的位图尺寸（hero 100x83）。放进带密度的目录会被按屏幕密度放大到
+ * 263x218，逻辑坐标写死的碰撞与摆位会整体错位。
  */
 public class DrawableSpriteLoader implements SpriteLoader {
 
