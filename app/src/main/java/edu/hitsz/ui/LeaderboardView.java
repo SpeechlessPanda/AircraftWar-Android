@@ -99,9 +99,11 @@ public class LeaderboardView extends LinearLayout {
 
         LayoutParams params = new LayoutParams(0, LayoutParams.WRAP_CONTENT);
         params.weight = 1f;
+        // 两个按钮等宽平分底部区域，weight 必须各自设置到自己的 LayoutParams 上。
         panel.addView(deleteButton, params);
-        panel.addView(menuButton, new LayoutParams(0, LayoutParams.WRAP_CONTENT));
-        ((LayoutParams) panel.getChildAt(1).getLayoutParams()).weight = 1f;
+        LayoutParams menuParams = new LayoutParams(0, LayoutParams.WRAP_CONTENT);
+        menuParams.weight = 1f;
+        panel.addView(menuButton, menuParams);
         return panel;
     }
 
