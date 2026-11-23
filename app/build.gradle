@@ -1,0 +1,46 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'edu.hitsz'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'edu.hitsz.aircraftwar'
+        // 课程要求：最小 API 级别 30。
+        minSdk 30
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.1'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+}
