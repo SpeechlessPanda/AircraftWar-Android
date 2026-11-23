@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -25,9 +26,9 @@ import java.util.List;
  * 与生命周期回调；SurfaceView 有独立的 Surface 和双缓冲，可以在子线程 lockCanvas
  * 绘制后再 unlockCanvasAndPost 提交，主线程只负责生命周期与页面切换。
  * <p>
- * 线程边界（指导书"子线程不能碰 UI"）：本类只在绘制线程里读游戏状态、画 Canvas，
- * 不改任何控件；需要通知 Activity 的事件通过主线程 Handler 转发，见
- * {@code MainActivity}。
+ * 线程边界（指导书"子线程不能碰 UI"）：本类只在绘制线程里推进游戏逻辑、读游戏
+ * 状态、画 Canvas，不改任何控件；游戏结束等需要跳页的事件通过主线程 Handler
+ * 转发给 Activity。
  */
 public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
@@ -63,6 +64,10 @@ public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Run
 
     public void setGame(Game game) {
         this.game = game;
+    }
+
+    public Game getGame() {
+        return game;
     }
 
     // ***********************
@@ -104,33 +109,40 @@ public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Run
         drawThread = null;
         if (thread != null) {
             thread.interrupt();
-            boolean joined = false;
-            while (!joined) {
+            boolean interrupted = false;
+            while (thread.isAlive()) {
                 try {
                     thread.join(200);
-                    joined = true;
                 } catch (InterruptedException e) {
-                    // 自己被中断时继续等，直到绘制线程真正退出。
-                    Thread.currentThread().interrupt();
-                    break;
+                    // 自己被中断时记录一次，继续等待绘制线程收尾。
+                    interrupted = true;
                 }
+            }
+            if (interrupted) {
+                Thread.currentThread().interrupt();
             }
         }
     }
 
     // ***********************
-    // 绘制线程
+    // 绘制线程：算 + 画
     // ***********************
 
     @Override
     public void run() {
         long nextFrame = System.currentTimeMillis();
         while (drawing) {
+            Game current = game;
+            // 先推进一帧逻辑，再把它画出来；两者都在绘制线程，读到的状态一致。
+            if (current != null) {
+                current.tick();
+            }
+
             Canvas canvas = null;
             try {
                 canvas = holder.lockCanvas();
                 if (canvas != null) {
-                    drawFrame(canvas);
+                    drawFrame(canvas, current);
                 }
             } catch (IllegalStateException e) {
                 // Surface 已被系统回收，正常退出循环，不当作崩溃。
@@ -159,8 +171,7 @@ public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Run
         Log.d(TAG, "draw loop exited");
     }
 
-    private void drawFrame(Canvas canvas) {
-        Game current = game;
+    private void drawFrame(Canvas canvas, Game current) {
         canvas.drawColor(Color.BLACK);
         if (current == null) {
             return;
@@ -233,11 +244,44 @@ public class BaseGame extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     // ***********************
-    // 坐标映射（供触摸与测试使用）
+    // 触屏输入：替代桌面版 HeroController 的鼠标拖拽
+    // ***********************
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Game current = game;
+        if (current == null) {
+            return false;
+        }
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_MOVE:
+                // 屏幕坐标先反算回 512x768 逻辑世界，再交给引擎，边界判定在引擎内。
+                current.moveHeroTo(toWorldX(event.getX()), toWorldY(event.getY()));
+                return true;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                // 抬手后英雄机停在最后位置，与桌面版拖拽结束行为一致。
+                return true;
+            default:
+                return super.onTouchEvent(event);
+        }
+    }
+
+    // ***********************
+    // 坐标映射（触摸与单测共用）
     // ***********************
 
     public float getRenderScale() {
         return scale;
+    }
+
+    public float getRenderOffsetX() {
+        return offsetX;
+    }
+
+    public float getRenderOffsetY() {
+        return offsetY;
     }
 
     public int toWorldX(float screenX) {
