@@ -8,15 +8,21 @@
 
 | 项 | 要求 |
 |---|---|
-| JDK | **21**（Gradle 8.11.1 只支持在 JDK 17–23 上运行） |
-| Android Studio | 支持 AGP 8.10.1 的版本（Ladybug 及以上） |
+| Android Studio | 任意自带 AGP 8.10.1 支持的版本（Ladybug 及以上） |
 | Android SDK | compileSdk 35，需安装 Android 15（API 35）平台 |
 | 运行设备 | Android 11（API 30）及以上的真机或模拟器 |
+| JDK | **不需要单独安装**。Gradle 9.2.1 可以直接跑在 Android Studio 自带的 JBR 上 |
 
-本工程**不含**任何本机路径配置。JDK 由你的 IDE 或环境变量提供：
+**用 Android Studio 打开本目录即可，不需要改任何 JDK 设置。** Studio 默认的 Gradle JDK 就是它自带的运行时，Gradle 9.2.1 已经支持它。
 
-- Android Studio：`Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK` 选 21
-- 命令行：`export JAVA_HOME=...`（Windows：`set JAVA_HOME=...`）
+如果你习惯用命令行：
+
+```bash
+./gradlew assembleDebug        # Linux / macOS
+gradlew.bat assembleDebug      # Windows cmd / PowerShell
+```
+
+**不要**在 `gradle.properties` 里写 `org.gradle.java.home`。那是本机路径，提交上去会让别人构建失败。确实需要指定 JDK 时，写到自己的 `~/.gradle/gradle.properties` 里。
 
 `local.properties`（指向本机 SDK 路径）由 Android Studio 首次打开时自动生成，已在 `.gitignore` 中，**不要提交**。
 
@@ -32,13 +38,18 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n edu.hitsz.aircraftwar/edu.hitsz.MainActivity
 ```
 
-Windows 上如果 `./gradlew` 报权限问题，用 `gradlew.bat`；Linux / macOS 上首次可能需要 `chmod +x gradlew`。
+Windows 上用 `gradlew.bat`；Linux / macOS 上 `./gradlew`（已带可执行位）。
 
 用 Android Studio 直接 `Open` 本目录即可，Gradle 会自动同步。
 
 ### 修改 Gradle / AGP 版本时注意
 
-`gradle/wrapper/gradle-wrapper.properties` 里的发行包地址指向腾讯云镜像，因为国内直连 `services.gradle.org` 经常超时。如果你在能直连的环境，可以改回官方地址；`distributionSha256Sum` 与版本号必须匹配，否则 wrapper 会拒绝启动。
+当前组合是 **Gradle 9.2.1 + AGP 8.10.1**。这个组合是刻意选的：它能在 Android Studio 自带的 JBR（目前是 25）上直接跑，所以协作者不需要装 JDK。
+
+改版本前注意两点：
+
+1. `gradle/wrapper/gradle-wrapper.properties` 的发行包地址指向腾讯云镜像（国内直连 `services.gradle.org` 常超时）。改回官方地址时，`distributionSha256Sum` 必须同步更新，否则 wrapper 会拒绝启动。
+2. 降回 Gradle 8.x 会让 Studio 的默认 JBR 失效，构建在配置阶段报 `Could not create task` 这类完全看不出原因的错。真要降，必须让每个人自行指定 JDK 17–23。
 
 ## 代码结构
 
