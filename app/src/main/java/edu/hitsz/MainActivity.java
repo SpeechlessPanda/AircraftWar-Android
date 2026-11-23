@@ -5,52 +5,44 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 
+import edu.hitsz.application.Game;
+import edu.hitsz.application.GameFactory;
 import edu.hitsz.application.ImageManager;
+import edu.hitsz.dao.ScoreStorage;
 import edu.hitsz.platform.DrawableSpriteLoader;
-import edu.hitsz.render.Sprite;
+import edu.hitsz.ui.BaseGame;
 
 /**
- * 实验二第 2 步：资源与图片加载。
+ * 实验二第 3 步：游戏循环迁移。
  * <p>
- * 这一步把桌面版 {@code ImageIO.read(文件)} 换成
- * {@code BitmapFactory.decodeResource(getResources(), R.drawable.xxx)}，
- * 验证点是 16 张图全部能解码并且尺寸与原始资源一致。游戏循环在第 3 步接入。
+ * 这一版把 {@link BaseGame}（SurfaceView + 绘制线程）挂到 Activity 上，
+ * 验证点是"能看到一帧静止画面（背景 + 英雄机）"。
+ * 交互与完整逻辑在步骤 4 接入。
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements Game.GameOverListener {
 
     private static final String TAG = "AircraftWar";
+
+    private BaseGame baseGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_main);
 
+        ScoreStorage.setBaseDir(getFilesDir().toPath().resolve("scores"));
         ImageManager.init(new DrawableSpriteLoader(this));
-        logSprite("hero", ImageManager.HERO_IMAGE);
-        logSprite("mob", ImageManager.MOB_ENEMY_IMAGE);
-        logSprite("elite", ImageManager.ELITE_ENEMY_IMAGE);
-        logSprite("elite_plus", ImageManager.ELITE_PLUS_ENEMY_IMAGE);
-        logSprite("elite_pro", ImageManager.ELITE_PRO_ENEMY_IMAGE);
-        logSprite("boss", ImageManager.BOSS_ENEMY_IMAGE);
-        logSprite("bullet_hero", ImageManager.HERO_BULLET_IMAGE);
-        logSprite("bullet_enemy", ImageManager.ENEMY_BULLET_IMAGE);
-        logSprite("prop_blood", ImageManager.BLOOD_SUPPLY_IMAGE);
-        logSprite("prop_bullet", ImageManager.FIRE_SUPPLY_IMAGE);
-        logSprite("prop_bullet_plus", ImageManager.FIRE_PLUS_SUPPLY_IMAGE);
-        logSprite("prop_bomb", ImageManager.BOMB_SUPPLY_IMAGE);
-        logSprite("prop_freeze", ImageManager.FREEZE_SUPPLY_IMAGE);
-        logSprite("bg", ImageManager.BACKGROUND_IMAGE);
-        logSprite("bg2", ImageManager.BACKGROUND_IMAGE_2);
-        logSprite("bg3", ImageManager.BACKGROUND_IMAGE_3);
-        Log.i(TAG, "step 2: all drawables decoded");
+
+        baseGame = new BaseGame(this);
+        setContentView(baseGame);
+
+        Game game = GameFactory.create("normal", this);
+        baseGame.setGame(game);
+        Log.i(TAG, "step 3: surface view attached, waiting for a static frame");
     }
 
-    private void logSprite(String key, Sprite sprite) {
-        if (sprite == null) {
-            Log.e(TAG, "sprite missing: " + key);
-            return;
-        }
-        Log.i(TAG, "sprite " + key + " = " + sprite.getWidth() + "x" + sprite.getHeight());
+    @Override
+    public void onGameOver(String difficulty, int score, String achievementSummary) {
+        Log.i(TAG, "game over " + difficulty + " score=" + score + " " + achievementSummary);
     }
 }

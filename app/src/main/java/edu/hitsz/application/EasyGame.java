@@ -1,0 +1,53 @@
+package edu.hitsz.application;
+
+public class EasyGame extends Game {
+
+    public EasyGame(GameOverListener listener) {
+        super("easy", listener);
+    }
+
+    @Override
+    protected double initialEnemySpawnCycle() {
+        return 28;
+    }
+
+    @Override
+    protected double initialHeroShootCycle() {
+        return 12;
+    }
+
+    @Override
+    protected double initialEnemyShootCycle() {
+        return 36;
+    }
+
+    @Override
+    protected int maxEnemyCount() {
+        return 5;
+    }
+
+    @Override
+    protected double mobEnemyProbability() {
+        return 0.50;
+    }
+
+    @Override
+    protected double eliteEnemyProbability() {
+        return 0.25;
+    }
+
+    @Override
+    protected double elitePlusEnemyProbability() {
+        return 0.15;
+    }
+
+    @Override
+    protected boolean canCreateBoss() {
+        return false;
+    }
+
+    @Override
+    protected double supplyDropProbability() {
+        return 0.55;
+    }
+}
