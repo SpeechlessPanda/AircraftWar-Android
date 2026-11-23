@@ -28,19 +28,21 @@ gradlew.bat assembleDebug      # Windows cmd / PowerShell
 
 ## 开始
 
-```bash
-# 克隆后直接构建
-./gradlew assembleDebug          # 产物：app/build/outputs/apk/debug/app-debug.apk
-./gradlew testDebugUnitTest      # 单元测试
+**最快路径**：Android Studio 里 `Open` 本目录 → 等 Gradle 同步完成 → Run `app`。
 
-# 装到设备 / 模拟器
+命令行：
+
+```bash
+./gradlew assembleDebug          # 产物：app/build/outputs/apk/debug/app-debug.apk
+./gradlew testDebugUnitTest      # 单元测试（58 个用例）
+```
+
+装到设备或模拟器（`adb` 在 Android SDK 的 `platform-tools` 目录）：
+
+```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n edu.hitsz.aircraftwar/edu.hitsz.MainActivity
 ```
-
-Windows 上用 `gradlew.bat`；Linux / macOS 上 `./gradlew`（已带可执行位）。
-
-用 Android Studio 直接 `Open` 本目录即可，Gradle 会自动同步。
 
 ### 修改 Gradle / AGP 版本时注意
 
