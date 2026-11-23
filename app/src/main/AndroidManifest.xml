@@ -5,7 +5,7 @@
         android:allowBackup="false"
         android:hardwareAccelerated="true"
         android:icon="@android:drawable/ic_media_play"
-        android:label="Aircraft War"
+        android:label="@string/app_name"
         android:supportsRtl="false"
         android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen">
 
